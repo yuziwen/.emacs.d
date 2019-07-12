@@ -141,6 +141,8 @@
   (require-init 'init-dired)
   (require-init 'init-writting)
 
+
+  (require-init 'init-ox-publish)
   ;; @see https://github.com/hlissner/doom-emacs/wiki/FAQ
   ;; Adding directories under "site-lisp/" to `load-path' slows
   ;; down all `require' statement. So we do this at the end of startup
