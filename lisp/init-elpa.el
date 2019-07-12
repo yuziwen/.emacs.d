@@ -164,7 +164,8 @@ You still need modify `package-archives' in \"init-elpa.el\" to PERMANENTLY use 
 The function is called with the arguments PACKAGE VERSION ARCHIVE, where
 PACKAGE is a symbol, VERSION is a vector as produced by `version-to-list', and
   ARCHIVE is the string name of the package archive."
-    (cond
+  (cond
+   (t t)
      ((string= archive "melpa-stable")
       (not (memq package melpa-stable-banned-packages)))
 
