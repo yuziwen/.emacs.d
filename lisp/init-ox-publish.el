@@ -27,3 +27,17 @@
          :recursive t
          :publishing-function org-publish-attachment)
         ("blog" :components ("blog-notes" "blog-static"))))
+
+
+;; change export color in src block
+(defun my-html-filter-src-color (src-block backend info)
+  (when (org-export-derived-backend-p backend 'html)
+    (let ((result src-block))
+      (setq result (replace-regexp-in-string "#00ffff" "#262680" result)) ;; keywords
+      (setq result (replace-regexp-in-string "#7fffd4" "#228b22" result)) ;; self-eval
+      (setq result (replace-regexp-in-string "#b0c4de" "#262680" result)) ;; primitives
+      (setq result (replace-regexp-in-string "#87cefa\\|#eedd82\\|#98fb98" "black" result)) ;; functions and variables and types
+      result)))
+
+(add-to-list 'org-export-filter-src-block-functions
+             'my-html-filter-src-color)
