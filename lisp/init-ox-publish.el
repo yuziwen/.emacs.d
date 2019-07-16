@@ -1,29 +1,38 @@
-;; publish my personal blog
+;;; publish my personal blog
 
 (require 'ox-publish)
 
 (setq org-publish-project-alist
       '(("blog-notes"
-         :base-directory "~/yuziwen.github.io/org"
+         :base-directory "~/blog/org"
          :base-extension "org"
-         :publishing-directory "~/yuziwen.github.io/public_html/"
+         :publishing-directory "~/blog/"
          :recursive t
          :publishing-function org-html-publish-to-html
-         :headline-levels 2
+         :html-link-home "index.html"
+         :html-link-org-files-as-html org-html-link-org-files-as-html
+         :headline-levels 4
+         :with-author nil
+         :with-email nil
+         :with-creator nil
+         :with-timestamps nil
+         :html-postamble nil
          :auto-preamble t
          :section-numbers nil
-         ;; :author "Yourname"
-         ;; :email "example@test.com"
+         :auto-preamble t
+         :section-numbers nil
          :auto-sitemap t       ; Generate sitemap.org automagically...
          :sitemap-filename "sitemap.org"
          :sitemap-title "Sitemap"
          :sitemap-sort-files anti-chronologically
          :sitemap-file-entry-format "%d %t"
-         :html-head "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/worg.css\"/>")
+         :html-head-include-default-style nil
+         :html-head-include-scripts nil
+         :html-head "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/worg.css\"/>")
         ("blog-static"
-         :base-directory "~/yuziwen.github.io/org"
+         :base-directory "~/blog/org"
          :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
-         :publishing-directory "~/yuziwen.github.io/public_html"
+         :publishing-directory "~/blog"
          :recursive t
          :publishing-function org-publish-attachment)
         ("blog" :components ("blog-notes" "blog-static"))))
@@ -41,3 +50,5 @@
 
 (add-to-list 'org-export-filter-src-block-functions
              'my-html-filter-src-color)
+
+(provide 'init-ox-publish)
