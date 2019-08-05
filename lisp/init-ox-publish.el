@@ -11,7 +11,7 @@
          :publishing-function org-html-publish-to-html
          :html-link-home "index.html"
          :html-link-org-files-as-html org-html-link-org-files-as-html
-         :headline-levels 4
+         :headline-levels 2
          :with-author nil
          :with-email nil
          :with-creator nil
@@ -21,11 +21,11 @@
          :section-numbers nil
          :auto-preamble t
          :section-numbers nil
-         :auto-sitemap t       ; Generate sitemap.org automagically...
-         :sitemap-filename "sitemap.org"
-         :sitemap-title "Sitemap"
-         :sitemap-sort-files anti-chronologically
-         :sitemap-file-entry-format "%d %t"
+         ;; :auto-sitemap t       ; Generate sitemap.org automagically...
+         ;; :sitemap-filename "sitemap.org"
+         ;; :sitemap-title "Sitemap"
+         ;; :sitemap-sort-files anti-chronologically
+         ;; :sitemap-file-entry-format "%d %t"
          :html-head-include-default-style nil
          :html-head-include-scripts nil
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/worg.css\"/>")
