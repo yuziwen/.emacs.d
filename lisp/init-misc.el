@@ -622,7 +622,7 @@ If step is -1, go backward."
 
 (defun diff-region-tag-selected-as-a ()
   "Select a region to compare."
-  (interactive "P")
+  (interactive)
   (when (region-active-p)
     (let* (tmp buf)
       ;; select lines
@@ -1401,5 +1401,11 @@ If use-indirect-buffer is not nil, use `indirect-buffer' to hold the widen conte
 
 ;; {{ octave
 (add-auto-mode 'octave-mode "\\.m$")
+(add-hook 'octave-mode-hook
+          (lambda ()
+            (abbrev-mode 1)
+            (auto-fill-mode 1)
+            (if (eq window-system 'x)
+                (font-lock-mode 1))))
 ;; }}
 (provide 'init-misc)
