@@ -1,2 +1,0 @@
-this is my emacs.d configuration
-based on [[https://github.com/redguardtoo/emacs.d][redguartoo/emacs.d]]
