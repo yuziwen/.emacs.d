@@ -48,7 +48,19 @@
       (setq result (replace-regexp-in-string "#87cefa\\|#eedd82\\|#98fb98" "black" result)) ;; functions and variables and types
       result)))
 
+;; remove linebreak after chinese full-width symbols
+;;    and spaces before them
+(defun my-html-remove-extra-linebreak (source backend info)
+  (when (org-export-derived-backend-p backend 'html)
+    (let ((result source))
+      (setq result
+            (replace-regexp-in-string
+             " ?\\([。，？！》；：、）】」]\\)[\n ]?" "\\1" result))
+      result)))
+
 (add-to-list 'org-export-filter-src-block-functions
              'my-html-filter-src-color)
+(add-to-list 'org-export-filter-paragraph-functions
+             'my-html-remove-extra-linebreak)
 
 (provide 'init-ox-publish)
