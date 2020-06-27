@@ -184,15 +184,8 @@ PACKAGE is a symbol, VERSION is a vector as produced by `version-to-list', and
       (setq add-to-p
             (or (member pkg-name melpa-include-packages)
                 ;; color themes are welcomed
-                (string-match-p "-theme" (format "%s" pkg-name))))))
+                (string-match-p "-theme" (format "%s" pkg-name)))))))
 
-    (when my-debug
-      (message "package name=%s version=%s package=%s" pkg-name version package))
-
-    (when add-to-p
-      ;; The package is visible through package manager
-      (apply orig-func args))))
-(advice-add 'package--add-to-archive-contents :around #'my-package--add-to-archive-contents-hack)
 
 ;; On-demand installation of packages
 (defun require-package (package &optional min-version no-refresh)
