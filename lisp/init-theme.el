@@ -7,7 +7,7 @@
 ;; so it should not be turned off by default
 ;; (blink-cursor-mode -1)
 
-(defun pickup-random-color-theme (themes)
+(defun my-pickup-random-color-theme (themes)
   "Pickup random color theme from themes."
   (my-ensure 'counsel)
   (let* ((available-themes (mapcar 'symbol-name themes))
@@ -15,11 +15,15 @@
     (counsel-load-theme-action theme)
     (message "Color theme [%s] loaded." theme)))
 
+(defvar my-favourite-color-themes nil
+  "Color themes to use by `random-color-theme'.")
+
 ;; random color theme
-(defun random-color-theme ()
+(defun my-random-color-theme ()
   "Random color theme."
   (interactive)
-  (pickup-random-color-theme (custom-available-themes)))
+  (my-pickup-random-color-theme (or my-favourite-color-themes
+                                    (custom-available-themes))))
 
 (defun random-healthy-color-theme (&optional join-dark-side)
   "Random healthy color theme.  If JOIN-DARK-SIDE is t, use dark theme only."
@@ -70,7 +74,45 @@
                                                 xp)))))
         (when (if prefer-light-p light-theme-p (not light-theme-p))
           (push theme themes))))
-  (pickup-random-color-theme themes)))
+  (my-pickup-random-color-theme themes)))
+
+(defun my-theme-packages(packages)
+  "Get themes from PACKAGES."
+  (let* ((sorted-packages (sort packages
+                                (lambda (a b)
+                                  (> (cdr a) (cdr b)))))
+         rlt
+         (topNum 110)
+         (i 0))
+    (dolist (p sorted-packages)
+      (let* ((name (symbol-name (car p))))
+        (when (and (< i topNum)
+                   (string-match-p "-themes?$" name)
+                   (not (member '("color-theme"
+                                  "smart-mode-line-powerline-theme"))))
+          (push name rlt)
+          (setq i (1+ i)))))
+    rlt))
+
+(defun my-insert-popular-theme-name ()
+  "Insert names of popular theme."
+  (interactive)
+  (let* (pkgs
+         (old-names (if (region-active-p) (mapcar 'string-trim
+                                                  (split-string (my-selected-str) "\n"))))
+         names)
+    (with-current-buffer
+        (url-retrieve-synchronously "http://melpa.org/download_counts.json" t t 30)
+      (goto-char (point-min))
+      (search-forward "{")
+      (backward-char) ; move cursor just before the "{"
+      (setq pkgs (json-read)))
+    (when (and pkgs
+               (setq names (nconc (my-theme-packages pkgs) old-names)))
+      (setq names (delete-dups (sort names 'string<)))
+      (my-delete-selected-region)
+      ;; insert theme package names
+      (insert (mapconcat 'identity names "\n")))))
 
 (provide 'init-theme)
 ;;; init-theme.el ends here
