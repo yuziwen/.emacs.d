@@ -6,50 +6,48 @@
 ;; use similar key bindings as init-evil.el
 (defhydra hydra-launcher (:color blue)
   "
-^Misc^                     ^Audio^               ^Move^                          ^Pomodoro^
------------------------------------------------------------------------------------------------
-[_ss_] Save workgroup     [_R_] Emms Random     [_sa_] Backward Sentence (M-a)  [_ss_] Start
-[_ll_] Load workgroup     [_n_] Emms Next       [_se_] Forward Sentence (M-e)   [_st_] Stop
-[_B_] New bookmark        [_p_] Emms Previous   [_la_] Backward Up List         [_sr_] Resume
-[_m_] Goto bookmark       [_P_] Emms Pause      [_le_] Forward List             [_sp_] Pause
-[_v_] Show/Hide undo      [_O_] Emms Open       [_pa_] Backward Paragraph (M-{)
-[_bb_] Switch Gnus buffer [_L_] Emms Playlist   [_pe_] Forward Paragraph (M-})
-[_e_] Erase buffer        [_w_] Pronounce word
-[_r_] Erase this buffer   [_E_] Typewriter on
-[_f_] Recent file         [_V_] old typewriter
+^Misc^                     ^Audio^              ^Study^
+--------------------------------------------------------------------------
+[_ss_] Save workgroup     [_R_] Emms Random     [_w_] Pronounce word
+[_ll_] Load workgroup     [_n_] Emms Next       [_W_] Big words definition
+[_B_] New bookmark        [_p_] Emms Previous   [_v_] Play big word video
+[_m_] Goto bookmark       [_P_] Emms Pause      [_im_] Image of word
+[_bb_] Switch Gnus buffer [_O_] Emms Open       [_ss_] Pomodoro start
+[_e_] Erase buffer        [_L_] Emms Playlist   [_st_] Pomodoro stop
+[_r_] Erase this buffer   [_E_] Typewriter on   [_sr_] Pomodoro resume
+[_f_] Recent file         [_V_] Old typewriter  [_sp_] Pomodoro pause
 [_d_] Recent directory
 [_bh_] Bash history
 [_hr_] Dired CMD history
 [_hh_] Random theme
+[_ii_] Imenu
 [_q_] Quit
 "
   ("hr" my-dired-redo-from-commands-history)
   ("B" bookmark-set)
   ("m" counsel-bookmark-goto)
   ("f" my-counsel-recentf)
-  ("d" counsel-recent-directory)
-  ("bh" counsel-insert-bash-history)
+  ("d" my-recent-directory)
+  ("bh" my-insert-bash-history)
   ("hh" random-healthy-color-theme)
   ("ss" wg-create-workgroup)
-  ("ll" my-wg-switch-workgroup)
+  ("ii" my-counsel-imenu)
+  ("ll" wg-open-workgroup)
+
   ("e" my-erase-visible-buffer)
-  ("r" my-erase-current-buffer)
+  ("r" my-erase-comint-shell-buffer)
   ("E" toggle-typewriter)
   ("V" twm/toggle-sound-style)
-  ("v" undo-tree-visualize)
   ("ss" pomodoro-start)
   ("st" pomodoro-stop)
   ("sr" pomodoro-resume)
   ("sp" pomodoro-pause)
-  ("sa" backward-sentence)
-  ("se" forward-sentence)
-  ("la" backward-up-list)
-  ("le" forward-list)
-  ("pa" backward-paragraph)
-  ("pe" forward-paragraph)
   ("R" emms-random)
   ("n" emms-next)
   ("w" mybigword-pronounce-word)
+  ("im" mybigword-show-image-of-word)
+  ("W" my-lookup-big-word-definition-in-buffer)
+  ("v" mybigword-play-video-of-word-at-point)
   ("p" emms-previous)
   ("P" emms-pause)
   ("O" emms-play-playlist)
@@ -276,7 +274,7 @@
 [_cc_] Last command         [_ff_] Find         [_dd_] directory
 [_sa_] Fetch all subtitles  [_C_]  Copy
 [_s1_] Fetch on subtitle    [_rb_] Change base
-[_vv_] Video => Mp3         [_dd_] Diff 2 files
+[_vv_] Video => Mp3         [_df_] Diff 2 files
 [_aa_] Recording Wav
 [_ee_] Mkv => Srt
 [_+_] Create directory
@@ -454,7 +452,7 @@ Git:
 [_ca_] Amend        [_b_] Branches
 [_ja_] Amend silent [_k_] Git commit link
 [_tt_] Stash        [_Q_] Quit gutter
-[_ta_] Apply Stash
+[_ta_] Apply Stash  [_f_] Find file in commit
 "
   ("ri" my-git-rebase-interactive)
   ("rr" git-gutter-reset-to-default)
@@ -474,6 +472,7 @@ Git:
   ("ja" (magit-commit-amend "--reuse-message=HEAD"))
   ("au" magit-stage-modified)
   ("Q" git-gutter-toggle)
+  ("f" my-git-find-file-in-commit)
   ("q" nil))
 (global-set-key (kbd "C-c C-g") 'hydra-git/body)
 ;; }}

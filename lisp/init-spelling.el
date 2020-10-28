@@ -1,71 +1,25 @@
 ;; -*- coding: utf-8; lexical-binding: t; -*-
 
-;; avoid spell-checking doublon (double word) in certain major modes
-(defvar my-flyspell-check-doublon t
-  "Check doublon (double word) when calling `flyspell-highlight-incorrect-region'.")
- (make-variable-buffer-local 'my-flyspell-check-doublon)
-
 (defvar my-default-spell-check-language "en_US"
   "Language used by aspell and hunspell CLI.")
 
 (with-eval-after-load 'flyspell
-  ;; {{ flyspell setup for web-mode
-  (defun my-web-mode-flyspell-verify ()
-    (let* ((f (get-text-property (- (point) 1) 'face))
-           rlt)
-      (cond
-       ;; Check the words whose font face is NOT in below *blacklist*
-       ((not (memq f '(web-mode-html-attr-value-face
-                       web-mode-html-tag-face
-                       web-mode-html-attr-name-face
-                       web-mode-constant-face
-                       web-mode-doctype-face
-                       web-mode-keyword-face
-                       web-mode-comment-face ;; focus on get html label right
-                       web-mode-function-name-face
-                       web-mode-variable-name-face
-                       web-mode-css-property-name-face
-                       web-mode-css-selector-face
-                       web-mode-css-color-face
-                       web-mode-type-face
-                       web-mode-block-control-face)))
-        (setq rlt t))
-       ;; check attribute value under certain conditions
-       ((memq f '(web-mode-html-attr-value-face))
-        (save-excursion
-          (search-backward-regexp "=['\"]" (line-beginning-position) t)
-          (backward-char)
-          (setq rlt (string-match "^\\(value\\|class\\|ng[A-Za-z0-9-]*\\)$"
-                                  (or (thing-at-point 'symbol) "")))))
-       ;; finalize the blacklist
-       (t
-        (setq rlt nil)))
-      ;; If rlt is t, it's a typo. If nil, not a typo.
-      rlt))
-  (put 'web-mode 'flyspell-mode-predicate 'my-web-mode-flyspell-verify)
-  ;; }}
+  ;; You can also use "M-x ispell-word" or hotkey "M-$". It pop up a multiple choice
+  ;; @see http://frequal.com/Perspectives/EmacsTip03-FlyspellAutoCorrectWord.html
+  (global-set-key (kbd "C-c s") 'flyspell-auto-correct-word)
 
   ;; better performance
-  (setq flyspell-issue-message-flag nil)
+  (setq flyspell-issue-message-flag nil))
 
   ;; flyspell-lazy is outdated and conflicts with latest flyspell
 
-  (defun my-flyspell-highlight-incorrect-region-hack (orig-func &rest args)
-    "Don't mark doublon (double words) as typo."
-    (let* ((beg (nth 0 args))
-           (end (nth 1 args))
-           (poss (nth 2 args)))
-      (when (or my-flyspell-check-doublon (not (eq 'doublon poss)))
-        (apply orig-func args))))
-  (advice-add 'flyspell-highlight-incorrect-region :around #'my-flyspell-highlight-incorrect-region-hack))
-
-;; Logic:
+;; Basic Logic Summary:
 ;; If (aspell is installed) { use aspell}
 ;; else if (hunspell is installed) { use hunspell }
 ;; English dictionary is used.
 ;;
 ;; I prefer aspell because:
-;; - aspell is older
+;; - aspell is very stable and easy to install
 ;; - looks Kevin Atkinson still get some road map for aspell:
 ;; @see http://lists.gnu.org/archive/html/aspell-announce/2011-09/msg00000.html
 (defun my-detect-ispell-args (&optional run-together)
@@ -115,7 +69,7 @@ Please note RUN-TOGETHER makes aspell less capable.  So it should be used in `pr
 ;; that folder.
 ;;
 ;; 4. Hunspell's option "-d en_US" means finding dictionary "en_US"
-;; Set `ispell-local-dictionary-alist' to set that option of hunspell
+;; Modify `ispell-local-dictionary-alist' to set that option of hunspell
 ;;
 ;; 5. Copy "en_US.dic" and "en_US.aff" from that temporary folder to
 ;; the place for dictionary files. I use "~/usr_local/share/hunspell/".
@@ -123,10 +77,10 @@ Please note RUN-TOGETHER makes aspell less capable.  So it should be used in `pr
 ;; 6. Add that folder to shell environment variable "DICPATH"
 ;;
 ;; 7. Restart emacs so when hunspell is run by ispell/flyspell to make
-;; DICPATH take effect
+;; "DICPATH" take effect
 ;;
 ;; hunspell searches a dictionary named "en_US" in the path specified by
-;; `$DICPATH' by default.
+;; "DICPATH" by default.
 
 (defvar my-force-to-use-hunspell nil
   "Force to use hunspell.  If nil, try to detect aspell&hunspell.")
@@ -144,12 +98,15 @@ Please note RUN-TOGETHER makes aspell less capable.  So it should be used in `pr
     (setq ispell-local-dictionary "hunspelldict")
     (setq ispell-local-dictionary-alist
           (list (list "hunspelldict" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil (list "-d" my-default-spell-check-language) nil 'utf-8)))
-    ;; new variable i
+    ;; new variable `ispell-hunspell-dictionary-alist' is defined in Emacs
+    ;; If it's nil, Emacs tries to automatically set up the dictionaries.
     (when (boundp 'ispell-hunspell-dictionary-alist)
       (setq ispell-hunspell-dictionary-alist ispell-local-dictionary-alist)))
+
    (t (setq ispell-program-name nil)
       (message "You need install either aspell or hunspell for ispell"))))
 
+;; You could define your own configuration and call `my-configure-ispell-parameters' in "~/.custom.el"
 (my-configure-ispell-parameters)
 
 (defun my-ispell-word-hack (orig-func &rest args)
@@ -172,10 +129,6 @@ When fixing a typo, avoid pass camel case option to cli program."
   (my-ensure 'wucuo)
   (wucuo-start))
 (add-hook 'text-mode-hook 'text-mode-hook-setup)
-
-;; You can also use "M-x ispell-word" or hotkey "M-$". It pop up a multiple choice
-;; @see http://frequal.com/Perspectives/EmacsTip03-FlyspellAutoCorrectWord.html
-(global-set-key (kbd "C-c s") 'flyspell-auto-correct-word)
 
 (defun my-clean-aspell-dict ()
   "Clean ~/.aspell.pws (dictionary used by aspell)."
@@ -209,19 +162,14 @@ When fixing a typo, avoid pass camel case option to cli program."
                                         org-level-1
                                         org-document-info))
                   (rlt t)
-                  ff
                   th
                   b e)
              (save-excursion
                (goto-char start)
 
-               ;; get current font face
-               (setq ff (get-text-property start 'face))
-               (if (listp ff) (setq ff (car ff)))
-
                ;; ignore certain errors by set rlt to nil
                (cond
-                ((memq ff ignored-font-faces)
+                ((cl-intersection (my-what-face start) ignored-font-faces)
                  ;; check current font face
                  (setq rlt nil))
                 ((or (string-match "^ *- $" (buffer-substring (line-beginning-position) (+ start 2)))
@@ -243,7 +191,6 @@ When fixing a typo, avoid pass camel case option to cli program."
                  (setq b (re-search-backward begin-regexp nil t))
                  (if b (setq e (re-search-forward end-regexp nil t)))
                  (if (and b e (< start e)) (setq rlt nil)))))
-             ;; (if rlt (message "start=%s end=%s ff=%s" start end ff))
              rlt))))
 ;; }}
 
